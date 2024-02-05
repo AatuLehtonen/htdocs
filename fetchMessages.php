@@ -1,4 +1,8 @@
 <?php
+if(!isset($_POST['user'])) {
+    die("Et antanut kirjautuneen käyttäjän tunnusta!");
+}   
+
 $Id = $_POST["user"];
 require_once('Connect.php');
 
