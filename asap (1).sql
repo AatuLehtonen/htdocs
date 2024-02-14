@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 05.02.2024 klo 10:07
+-- Generation Time: 14.02.2024 klo 11:46
 -- Palvelimen versio: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -31,18 +31,22 @@ CREATE TABLE `käyttäjät` (
   `Id` int(11) NOT NULL,
   `Nimi` text NOT NULL,
   `Käyttäjänimi` text DEFAULT NULL,
+  `Puhelin` varchar(20) NOT NULL,
   `Sähköposti` text NOT NULL,
-  `Salasana` text NOT NULL,
-  `Rekisteröitynyt` datetime NOT NULL DEFAULT current_timestamp()
+  `Rekisteröitynyt` datetime NOT NULL DEFAULT current_timestamp(),
+  `Salt` char(32) NOT NULL,
+  `Salasana` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Vedos taulusta `käyttäjät`
 --
 
-INSERT INTO `käyttäjät` (`Id`, `Nimi`, `Käyttäjänimi`, `Sähköposti`, `Salasana`, `Rekisteröitynyt`) VALUES
-(2, 'Teemu', 'Osmoosi69', 'temppa@fi', '1234', '2024-01-25 10:01:36'),
-(3, 'Aatu', 'Timu', 'attu@fi', '4321', '2024-01-25 10:12:20');
+INSERT INTO `käyttäjät` (`Id`, `Nimi`, `Käyttäjänimi`, `Puhelin`, `Sähköposti`, `Rekisteröitynyt`, `Salt`, `Salasana`) VALUES
+(2, 'Teemu', 'Osmoosi69', '0100100', 'temppa@fi', '2024-01-25 10:01:36', '', ''),
+(3, 'Aatu', 'Timu', '42069', 'attu@fi', '2024-01-25 10:12:20', '', ''),
+(4, '', '', '', '', '2024-02-12 13:44:10', 'cfe6c3a186de5505c750b8336d761d9e', '$2y$10$yyOutgZwGC07qCt9tmE/Wetpg.UP3owQ6aNmuC8nAT3yVNdmkvp9a'),
+(5, '', 'mie', '0100100', 'minä@mail.fi', '2024-02-12 13:45:03', '80e9b2ec7989d6910c8a4698792754d3', '$2y$10$dWYCoqYQiN2purGNYND0P.gvjtgkXDHnDYG3rXLZTOhfiMTGncx0W');
 
 -- --------------------------------------------------------
 
@@ -101,7 +105,7 @@ ALTER TABLE `viestit`
 -- AUTO_INCREMENT for table `käyttäjät`
 --
 ALTER TABLE `käyttäjät`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `viestit`
