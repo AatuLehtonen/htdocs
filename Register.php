@@ -5,10 +5,11 @@ require_once('Connect.php');
 // Process registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Jos ei ole annettu kaikkia vaadittavia tietoja, niin lopetetaan koodin suoritus ja kerrotaan se käyttäjälle.
-    if(isset(!$_POST["username"]) && isset(!$_POST["email"]) && isset(!$_POST["phone"] && isset(!$_POST["password"]))) {
+    if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["phone"]) || !isset($_POST["password"])) {
         die('Error: Not enough parameters provided.');
     }
-    
+
+
     $username = $_POST['username'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $saltedPassword = $salt . $password;
 
     // Hash the salted password
-    $hashedPassword = password_hash($saltedPassword, PASSWORD_BCRYPT);
+    $hash = password_hash($saltedPassword, PASSWORD_BCRYPT);
 
     // Insert user information into the database
     $stmt = $connection->prepare("INSERT INTO käyttäjät (Käyttäjänimi, Sähköposti, Puhelin, salt, Salasana) VALUES (?, ?, ?, ?, ?)");

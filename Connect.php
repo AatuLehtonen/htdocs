@@ -1,6 +1,6 @@
 <?php
-$user = "Teemu";
-$password = "1234";
+$user = "root";
+$password = "";
 $host = "localhost";
 $database = "asap";
 
