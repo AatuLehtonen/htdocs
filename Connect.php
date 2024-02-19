@@ -4,9 +4,7 @@ $password = "";
 $host = "localhost";
 $database = "asap";
 
-$connection = new mysqli($host, $user, $password, $database);
+$connection = new PDO("mysql:host=$host;dbname=$database", "$user", "$password");
 
-if ($connection->connect_error) {
-    die("Connection failed: " . $connection->connect_error);
-}
+$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 ?>

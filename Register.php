@@ -4,11 +4,10 @@ require_once('Connect.php');
 
 // Process registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Jos ei ole annettu kaikkia vaadittavia tietoja, niin lopetetaan koodin suoritus ja kerrotaan se käyttäjälle.
+    // Check if all required parameters are provided
     if (!isset($_POST["username"]) || !isset($_POST["email"]) || !isset($_POST["phone"]) || !isset($_POST["password"])) {
         die('Error: Not enough parameters provided.');
     }
-
 
     $username = $_POST['username'];
     $email = $_POST['email'];
@@ -24,19 +23,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Hash the salted password
     $hash = password_hash($saltedPassword, PASSWORD_BCRYPT);
 
-    // Insert user information into the database
-    $stmt = $connection->prepare("INSERT INTO käyttäjät (Käyttäjänimi, Sähköposti, Puhelin, salt, Salasana) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $username, $email, $phone, $salt, $hash);
+    try {
+        // Use prepared statements with PDO
+        $stmt = $connection->prepare("INSERT INTO käyttäjät (Käyttäjänimi, Sähköposti, Puhelin, salt, Salasana) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bindParam(1, $username);
+        $stmt->bindParam(2, $email);
+        $stmt->bindParam(3, $phone);
+        $stmt->bindParam(4, $salt);
+        $stmt->bindParam(5, $hash);
 
-    if ($stmt->execute()) {
-        echo "Registration successful!";
-    } else {
-        echo "Error: " . $stmt->error;
+        if ($stmt->execute()) {
+            echo "Registration successful!";
+        } else {
+            echo "Error: " . implode(" ", $stmt->errorInfo());
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    } finally {
+        // Close the statement
+        $stmt = null;
     }
-
-    $stmt->close();
 }
 
-$connection->close();
+// Close the connection
+$connection = null;
 
 ?>

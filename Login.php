@@ -1,36 +1,60 @@
 <?php
-// User's password from the registration form
-$userPassword = $_POST['password'];
+require_once('Connect.php');
 
-// Hash the password using the bcrypt algorithm (recommended)
-$hashedPassword = password_hash($userPassword, PASSWORD_BCRYPT);
+// Process login form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if all required parameters are provided
+    if (!isset($_POST["username"]) || !isset($_POST["password"])) {
+        die('Error: Not enough parameters provided.');
+    }
 
-// Store $hashedPassword in the database
+    // User's username from the login form
+    $username = $_POST['username'];
+    // User's password from the login form
+    $password = $_POST['password'];
 
-// Generate a random salt
-$salt = bin2hex(random_bytes(16)); // 16 bytes for a reasonable level of security
+    try {
+        // Retrieve the stored salt and hashed password from the database based on the username/email
+        $stmt = $connection->prepare("SELECT * FROM käyttäjät WHERE Käyttäjänimi = :username OR Sähköposti = :username LIMIT 1");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
 
-// Combine the salt with the user's password
-$saltedPassword = $salt . $userPassword;
+        // Fetch the result as an associative array
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Hash the salted password
-$hashedPassword = password_hash($saltedPassword, PASSWORD_BCRYPT);
+        if ($result) {
+            $user = $result['Käyttäjänimi'];
+            $email = $result['Sähköposti'];
+            $salt = $result['Salt'];
+            $hashedPassword = $result['Salasana'];
 
-// Store $salt and $hashedPassword in the database
+            // Combine the retrieved salt with the entered password
+            $saltedPassword = $salt . $password;
 
-// Retrieve the stored salt and hashed password from the database based on the username/email
-// ...
+            // Verify the password using password_verify
+            if (password_verify($saltedPassword, $hashedPassword)) {
+                // Password is correct
+                // Allow the user to log in
 
-// Combine the retrieved salt with the entered password
-$saltedPasswordAttempt = $salt . $_POST['password'];
-
-// Verify the password
-if (password_verify($saltedPasswordAttempt, $storedHashedPassword)) {
-    // Password is correct
-    // Allow the user to log in
-} else {
-    // Password is incorrect
-    // Deny access
+            } else {
+                // Password is incorrect
+                // Deny access
+                echo $hashedSaltedPassword . "\n" . $hashedPassword;
+                echo "Login failed!";
+            }
+        } else {
+            // User not found
+            echo "User not found!";
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    } finally {
+        // Close the statement
+        $stmt = null;
+    }
 }
+
+// Close the connection
+$connection = null;
 
 ?>
